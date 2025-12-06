@@ -4,10 +4,20 @@
 #   - $1: the module name to run tests, currently supported (api, web)
 # Exported variables: HOST_ARTIFACTS, ROOT_VENV, TEST_VENV, COPIED_PROJECT_PATH
 
+MODULE_NAME="$1"
 ARTIFACTS_ROOT_FOLDER="TEST1"
+REPO="$(pwd)"
+echo "REPO = '$REPO'"
 
-if [ -z $1 ]; then
+# Checking if the 1st argument is empty
+if [ -z "$MODULE_NAME" ]; then
   echo "ERROR: module name must be set to run the tests"
+  return 1
+fi
+
+# Checking if the 1st argument has a correct value
+if [[ ! -d "$MODULE_NAME" ]]; then
+  echo "ERROR: Provided module name '$MODULE_NAME' does not exist"
   return 1
 fi
 
@@ -29,9 +39,6 @@ fi
 #  echo "Using '$REPO' path for the repo"
 # fi
 
-REPO="$(pwd)"
-echo "REPO = '$REPO'"
-
 # Let's retrieve the project folder name from the path to the project
 PROJECT_FOLDER_NAME="${REPO##*/}"
 
@@ -39,7 +46,9 @@ PROJECT_FOLDER_NAME="${REPO##*/}"
 HOST_WORKSPACE="$HOME/$ARTIFACTS_ROOT_FOLDER/workspace"
 # path where artifacts will be stored
 HOST_ARTIFACTS="$HOST_WORKSPACE/artifact"
-export HOST_ARTIFACTS="$HOST_ARTIFACTS"
+TIMESTAMP_RESULTS="run-$(date +%Y%m%d-%H%M%S)"
+
+export HOST_ARTIFACTS="$HOST_ARTIFACTS/$TIMESTAMP_RESULTS"
 export COPIED_PROJECT_PATH="$HOST_WORKSPACE/$PROJECT_FOLDER_NAME"
 
 echo "Host workspace directory (copied project + logs, screenshots, etc.):"
@@ -62,12 +71,13 @@ cd "$COPIED_PROJECT_PATH"
 
 echo "Root env set up to: $(pwd)"
 export ROOT_VENV="$COPIED_PROJECT_PATH"
-echo "Entering the '$COPIED_PROJECT_PATH/$1' module"
-cd "$1"
+# echo "Entering the '$COPIED_PROJECT_PATH/$1' module"
+# cd "$1"
 
 # Activating venv
 
-MODULE_PATH="$ROOT_VENV/$1"
+# MODULE_PATH="$ROOT_VENV/$1"
+MODULE_PATH="$ROOT_VENV"
 cd "$MODULE_PATH"
 
 if python3 -m venv --help > /dev/null 2>&1; then
@@ -78,7 +88,7 @@ fi
 python3 -m venv venv
 . venv/bin/activate
 
-BASE_REQ_FILE="$MODULE_PATH/requirements.txt"
+BASE_REQ_FILE="$MODULE_PATH/$MODULE_NAME/requirements.txt"
 echo "Installing module requirements..."
 echo ""
 python3 -m pip install --upgrade pip
