@@ -5,7 +5,7 @@ Created on Sep-18-2025
 ---
 
 ## Note:
- - !!! This is just an example of the code; this framework cannot be used for testing Twitch or running multiple times !!!
+- !!! This is just an example of the code; this framework cannot be used for testing Twitch or running multiple times !!!
 
 ---
 
