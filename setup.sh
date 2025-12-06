@@ -21,24 +21,6 @@ if [[ ! -d "$MODULE_NAME" ]]; then
   return 1
 fi
 
-# DEFAULT_REPO_PATH="$HOME/python_pytest_selenium_web_api_test"
-
-# Repo path defaults to $DEFAULT_REPO_PATH
-# if [[ -z "$1" ]]; then
-#  echo "WARNING: no path passed for the project, defaulting to $DEFAULT_REPO_PATH"
-#  REPO="$DEFAULT_REPO_PATH"
-#  if [[ ! -d "$REPO" ]]; then
-#    echo "ERROR: Default path $DEFAULT_REPO_PATH for the repo does not exist"
-#    return 1
-#  fi
-# elif [[ ! -d "$1" ]]; then
-#  echo "ERROR: Provided path $1 for the repo does not exist"
-#  return 1
-# else
-#  REPO="$1"
-#  echo "Using '$REPO' path for the repo"
-# fi
-
 # Let's retrieve the project folder name from the path to the project
 PROJECT_FOLDER_NAME="${REPO##*/}"
 
