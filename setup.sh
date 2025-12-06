@@ -53,12 +53,9 @@ cd "$COPIED_PROJECT_PATH"
 
 echo "Root env set up to: $(pwd)"
 export ROOT_VENV="$COPIED_PROJECT_PATH"
-# echo "Entering the '$COPIED_PROJECT_PATH/$1' module"
-# cd "$1"
 
 # Activating venv
 
-# MODULE_PATH="$ROOT_VENV/$1"
 MODULE_PATH="$ROOT_VENV"
 cd "$MODULE_PATH"
 
