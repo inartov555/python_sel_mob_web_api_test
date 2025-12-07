@@ -1,8 +1,13 @@
 #!/bin/bash
 
 # Input parameters:
-#   - $1: the module name to run tests, currently supported (api, web)
+#
+#     Module name
+#   - $1 - the module name to run tests, currently supported (api, web)
+#
 # Exported variables in the setup.sh file: HOST_ARTIFACTS, ROOT_VENV, TEST_VENV, COPIED_PROJECT_PATH
+
+MODULE_NAME="${1:-''}"
 
 set -Eeuo pipefail
 trap cleanup EXIT ERR SIGINT SIGTERM
@@ -17,8 +22,6 @@ cleanup() {
     cd "$ORIGINAL_PROJECT_PATH"
   fi
 }
-
-MODULE_NAME="$1"
 
 ORIGINAL_PROJECT_PATH="$(pwd)"
 eval source ./setup.sh "$MODULE_NAME"

@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Input parameters:
-#   - $1: the module name to run tests, currently supported (api, web)
+#
+#     Module name
+#   - $1 - the module name to run tests, currently supported (api, web)
+#
 # Exported variables: HOST_ARTIFACTS, ROOT_VENV, TEST_VENV, COPIED_PROJECT_PATH
 
 MODULE_NAME="$1"
@@ -74,4 +77,4 @@ python3 -m pip install --upgrade pip
 python3 -m pip install -r "$BASE_REQ_FILE"
 
 echo "Virtual env set up to: $(pwd)"
-export TEST_VENV=$(pwd)
+export TEST_VENV="$(pwd)"
