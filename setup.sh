@@ -30,7 +30,7 @@ PROJECT_FOLDER_NAME="${REPO##*/}"
 # path where workspace will be stored
 HOST_WORKSPACE="$HOME/$ARTIFACTS_ROOT_FOLDER/workspace"
 # path where artifacts will be stored
-HOST_ARTIFACTS="$HOST_WORKSPACE/artifact"
+HOST_ARTIFACTS="$HOST_WORKSPACE/artifacts"
 TIMESTAMP_RESULTS="run-$(date +%Y%m%d-%H%M%S)"
 
 export HOST_ARTIFACTS="$HOST_ARTIFACTS/$TIMESTAMP_RESULTS"
