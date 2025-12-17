@@ -33,7 +33,6 @@ def add_loggers() -> None:
     log.setup_cli_handler(level=log_level)
     log.setup_filehandler(level=log_file_level, file_name=log_file)
     log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
-    log.info(f"Test's logs will be stored: '{log_file}'")
 
 
 def timestamped_path(file_name: str, file_ext: str, path_to_file: str = os.getenv("HOST_ARTIFACTS")) -> str:
