@@ -50,7 +50,7 @@ if [ $? -ne 0 ]; then
   ls $HOST_WORKSPACE
   return 1
 fi
-echo "$REPO is copied to $COPIED_PROJECT_PATH"
+echo "'$REPO' is copied to $COPIED_PROJECT_PATH"
 echo "Entering the $COPIED_PROJECT_PATH directory"
 cd "$COPIED_PROJECT_PATH"
 
