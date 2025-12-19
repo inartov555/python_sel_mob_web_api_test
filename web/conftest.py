@@ -136,15 +136,25 @@ def setup_for_testing(request, driver):
     """
     Setting up pages for testing
     """
+    _app_config = request.getfixturevalue("app_config")
     request.cls.driver = driver
     request.cls.home_page = HomePage(driver)
     request.cls.search_page = SearchPage(driver)
     request.cls.streamer_page = StreamerPage(driver)
 
     # 1. Open home
-    request.cls.home_page.open("https://m.twitch.tv")
+    request.cls.home_page.open(_app_config.base_url)
     # Getting rid off the cookies overlay
     request.cls.home_page.confirm_cookies_overlay_if_shown()
+
+
+@pytest.fixture(scope="session")
+def base_url(request) -> str:
+    """
+    Get base URL from the fixture
+    """
+    _app_config = request.getfixturevalue("app_config")
+    return _app_config.base_url
 
 
 def get_mobile_emulation(version):
