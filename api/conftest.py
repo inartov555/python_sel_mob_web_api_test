@@ -48,8 +48,7 @@ def app_config(pytestconfig) -> AppConfig:
     result_dict = {}
     cfg = ConfigParser(interpolation=ExtendedInterpolation())
     cfg.read(ini_config_file)
-    # result_dict["base_url"] = cfg.get("pytest", "base_url", fallback="https://catfact.ninja")
-    result_dict["base_url"] = cfg.get("pytest", "base_url", fallback="NONE")
+    result_dict["base_url"] = cfg.get("pytest", "base_url", fallback="https://catfact.ninja")
     return AppConfig(**result_dict)
 
 

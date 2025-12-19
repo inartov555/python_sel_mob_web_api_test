@@ -9,6 +9,7 @@ from configparser import ConfigParser, ExtendedInterpolation
 
 import pytest
 from selenium import webdriver
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.chrome.options import Options
 
 from tools.logger.logger import Logger
@@ -52,11 +53,19 @@ def app_config(pytestconfig) -> AppConfig:
     cfg = ConfigParser(interpolation=ExtendedInterpolation())
     cfg.read(ini_config_file)
     result_dict["browser"] = cfg.get("pytest", "browser", fallback="chrome")
-    result_dict["base_url"] = cfg.get("pytest", "base_url", fallback="https://www.instagram.com")
+    result_dict["device"] = cfg.get("pytest", "device", fallback="Pixel 5")
+    result_dict["base_url"] = cfg.get("pytest", "base_url", fallback="https://m.twitch.tv")
     result_dict["is_headless"] = cfg.getboolean("pytest", "is_headless", fallback=False)
     result_dict["width"] = cfg.getint("pytest", "width", fallback=400)
     result_dict["height"] = cfg.getint("pytest", "height", fallback=1000)
     return AppConfig(**result_dict)
+
+
+def pytest_addoption(parser):
+    """
+    Supported options
+    """
+    parser.addoption("--ini-config", action="store", default="pytest.ini", help="The path to the *.ini config file")
 
 
 @pytest.fixture(scope="session")
@@ -84,14 +93,30 @@ def timestamped_path(file_name: str, file_ext: str, path_to_file: str = os.geten
     return os.path.join(path_to_file, f"{file_name}-{ts}.{file_ext}")
 
 
-def pytest_addoption(parser):
+def get_driver(browser: str) -> WebDriver:
     """
-    Supported options
+    Get a driver for passed browser settings
     """
-    parser.addoption("--base-url", action="store", default="https://m.twitch.tv", help="Base URL for the site")
-    parser.addoption("--device", action="store", default="Pixel 5", help="Chrome mobile emulation device name")
-    parser.addoption("--headless", action="store", default="false", help="Run headless Chrome (true/false)")
-    parser.addoption("--window-size", action="store", default="300,1000", help="Web browser window size")
+    _app_config = request.getfixturevalue("app_config")
+    if browser in ("chrome", "chromium"):
+        window_size = pytestconfig.getoption("--window-size", f"{_app_config.width},{_app_config.height}")
+        headless = _app_config.is_headless
+
+        options = Options()
+        mobile_emulation = get_mobile_emulation(_app_config.device)
+        options.add_experimental_option("mobileEmulation", mobile_emulation)
+        if headless:
+            options.add_argument("--headless=new")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument(f"--window-size={window_size}")
+
+        _driver = webdriver.Chrome(options=options)
+        _driver.set_page_load_timeout(60)
+        return _driver
+    else:
+        raise ValueError(f"'{browser}' value is not currently supported")
 
 
 @pytest.fixture(scope="session")
@@ -99,22 +124,8 @@ def driver(pytestconfig):
     """
     Browser driver
     """
-    device = pytestconfig.getoption("--device")
-    window_size = pytestconfig.getoption("--window-size", "300,1000")
-    headless = pytestconfig.getoption("--headless").lower() == "true"
-
-    options = Options()
-    mobile_emulation = get_mobile_emulation(device)
-    options.add_experimental_option("mobileEmulation", mobile_emulation)
-    if headless:
-        options.add_argument("--headless=new")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument(f"--window-size={window_size}")
-
-    _driver = webdriver.Chrome(options=options)
-    _driver.set_page_load_timeout(60)
+    _app_config = request.getfixturevalue("app_config")
+    _driver = get_driver(_app_config.browser)
     yield _driver
     _driver.quit()
 
