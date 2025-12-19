@@ -115,8 +115,7 @@ def get_driver(browser: str, pytestconfig, request) -> WebDriver:
         _driver = webdriver.Chrome(options=options)
         _driver.set_page_load_timeout(60)
         return _driver
-    else:
-        raise ValueError(f"'{browser}' value is not currently supported")
+    raise ValueError(f"'{browser}' value is not currently supported")
 
 
 @pytest.fixture(scope="session")

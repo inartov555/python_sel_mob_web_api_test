@@ -46,7 +46,7 @@ class ApiBase:
         self.protocol = protocol
         self.host = host
         self.port = str(port)
-        self.headers = {"User-Agent": "python-automation-home-test",
+        self.headers = {"User-Agent": "automation-framework",
                         "Unique-RequestId": str(self._unique_request_id_increment) + "_" + hex(int(time.time()))}
 
     def append_headers(self, new_headers: dict):
@@ -219,9 +219,6 @@ class PublicApi(ApiJsonRequest):
     """
     API methods
     """
-
-    def __init__(self, protocol: str, host: str, port: str):
-        super().__init__(protocol, host, port)
 
     def get_facts(self, page=None, limit=None):
         """

@@ -38,10 +38,7 @@ Pop‑ups/modals are handled when present.
 ---
 
 Useful options:
-- `--device`: Chrome device name for emulation (e.g., `Pixel 5`, `iPhone 12 Pro`)
-- `--headless`: run headless Chrome (`true`/`false`, defaults to 'false')
-- `--base-url`: override base URL (defaults to `https://m.twitch.tv`)
-- `--window-size`: the web browser window size (defaults to 300,1000)
+- `--ini-config`: The path to the *.ini config file
 
 > Tip: Selenium Manager auto-downloads the matching ChromeDriver. Make sure Google Chrome is installed.
 
@@ -91,4 +88,4 @@ This project contains example automated API tests using the public, no‑auth **
 
 ---
 
-![Demo animation](https://github.com/inartov555/python-automation-home-test/blob/main/demo/DEMO%20Sep-12-2025.gif)
+![Demo animation](https://github.com/inartov555/python_sel_mob_web_api_test/blob/main/demo/DEMO%20Sep-12-2025.gif)
