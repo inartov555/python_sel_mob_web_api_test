@@ -5,6 +5,7 @@ conftest.py file
 
 import os
 from datetime import datetime
+from configparser import ConfigParser, ExtendedInterpolation
 
 import pytest
 from selenium import webdriver
@@ -14,6 +15,7 @@ from tools.logger.logger import Logger
 from web.src.pages.home_page import HomePage
 from web.src.pages.search_page import SearchPage
 from web.src.pages.streamer_page import StreamerPage
+from web.src.core.app_config import AppConfig
 
 
 log = Logger(__name__)
@@ -37,6 +39,24 @@ def add_loggers() -> None:
     log.setup_cli_handler(level=log_level)
     log.setup_filehandler(level=log_file_level, file_name=log_file)
     log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
+
+
+@pytest.fixture(scope="session")
+def app_config(pytestconfig) -> AppConfig:
+    """
+    Set and get AppConfig from ini config
+    """
+    ini_config_file = pytestconfig.getoption("--ini-config")
+    log.info(f"Reading config properties from '{ini_config_file}' and storing to a data class")
+    result_dict = {}
+    cfg = ConfigParser(interpolation=ExtendedInterpolation())
+    cfg.read(ini_config_file)
+    result_dict["browser"] = cfg.get("pytest", "browser", fallback="chrome")
+    result_dict["base_url"] = cfg.get("pytest", "base_url", fallback="https://www.instagram.com")
+    result_dict["is_headless"] = cfg.getboolean("pytest", "is_headless", fallback=False)
+    result_dict["width"] = cfg.getint("pytest", "width", fallback=400)
+    result_dict["height"] = cfg.getint("pytest", "height", fallback=1000)
+    return AppConfig(**result_dict)
 
 
 @pytest.fixture(scope="session")

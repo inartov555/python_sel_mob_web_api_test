@@ -5,11 +5,14 @@ conftest.py file
 
 import os
 from datetime import datetime
+from configparser import ConfigParser, ExtendedInterpolation
 
 import pytest
 
 from tools.logger.logger import Logger
+from tools.url_utils import get_http_prot_url_port_separately
 from api.api.public_api import PublicApi
+from api.core.app_config import AppConfig
 
 
 log = Logger(__name__)
@@ -35,6 +38,21 @@ def add_loggers() -> None:
     log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
 
 
+@pytest.fixture(scope="session")
+def app_config(pytestconfig) -> AppConfig:
+    """
+    Set and get AppConfig from ini config
+    """
+    ini_config_file = pytestconfig.getoption("--ini-config")
+    log.info(f"Reading config properties from '{ini_config_file}' and storing to a data class")
+    result_dict = {}
+    cfg = ConfigParser(interpolation=ExtendedInterpolation())
+    cfg.read(ini_config_file)
+    # result_dict["base_url"] = cfg.get("pytest", "base_url", fallback="https://catfact.ninja")
+    result_dict["base_url"] = cfg.get("pytest", "base_url", fallback="NONE")
+    return AppConfig(**result_dict)
+
+
 def timestamped_path(file_name: str, file_ext: str, path_to_file: str = os.getenv("HOST_ARTIFACTS")) -> str:
     """
     Args:
@@ -49,24 +67,11 @@ def timestamped_path(file_name: str, file_ext: str, path_to_file: str = os.geten
     return os.path.join(path_to_file, f"{file_name}-{ts}.{file_ext}")
 
 
-def pytest_addoption(parser):
-    """
-    Supported options
-    """
-    parser.addoption('--api-base', action='store', default='https://catfact.ninja', help='Base URL for API tests')
-
-
-@pytest.fixture(scope='session')
-def api_base(pytestconfig):
-    """
-    Get base URL from the fixture
-    """
-    return pytestconfig.getoption('--api-base').rstrip('/')
-
-
 @pytest.fixture(autouse=True, scope="class")
 def setup_api_testing(request):
     """
     Setting API instance for testing
     """
-    request.cls.public_api = PublicApi()
+    _app_config = request.getfixturevalue("app_config")
+    protocol, host, port = get_http_prot_url_port_separately(_app_config.base_url)
+    request.cls.public_api = PublicApi(protocol, host, port)

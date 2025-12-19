@@ -1,0 +1,28 @@
+def get_http_prot_url_port_separately(self, url):
+    """
+    Args:
+        url (str): e.g. http://some-host:80
+
+    Returns:
+        tuple, (http_protocol, base_url, port, path_uri, query_params)
+    """
+    port_regex = re.compile(r"(^.*:(\d+).*$)")
+    parsed = urlparse(url)
+    # When HTTP protocol is not provided, URL is placed to urlparse.path param
+    if not parsed.scheme and port_regex.search(parsed.path) is None:
+        raise ValueError(f"URL should contain at least HTTP protcol (http/https); current value: {url}")
+    base_url, port = self.get_base_url_and_port(
+        parsed.netloc or parsed.path,
+        port_regex.search(parsed.netloc) is not None or port_regex.search(parsed.path) is not None)
+    if parsed.scheme:
+        http_protocol = parsed.scheme
+    else:
+        http_protocol = "https" if port in ("443", "8443") else "http"
+    query_params = parsed.query
+    if parsed.netloc:
+        path_uri = parsed.path
+    else:
+        path_uri = parsed.path[parsed.path.find("/"):len(parsed.path)] if parsed.path.find("/") > 0 else ""
+    if not port:
+        port = "443" if http_protocol == "https" else "80"
+    return (http_protocol, base_url, port, path_uri, query_params)
