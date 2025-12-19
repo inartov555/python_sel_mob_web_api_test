@@ -11,7 +11,7 @@
 # Exported variables in the setup.sh file: HOST_ARTIFACTS, ROOT_VENV, TEST_VENV, COPIED_PROJECT_PATH
 
 MODULE_NAME="${1:-''}"
-DEFAULT_INI_CONFIG_FILE="pytest.ini"
+DEFAULT_INI_CONFIG_FILE="$MODULE_NAME/pytest.ini"
 PASSED_CONFIG_FILE="${2:-$DEFAULT_INI_CONFIG_FILE}"
 
 set -Eeuo pipefail
@@ -47,6 +47,7 @@ else
 fi
 
 python3 -m pytest "$MODULE_NAME" -v --tb=short -s --reruns 2 --reruns-delay 2 --ini-config "$INI_CONFIG_FILE" --html="$HOST_ARTIFACTS/test_report_$(date +%Y-%m-%d_%H-%M-%S).html"
+# python3 -m pytest "$MODULE_NAME" -v --tb=short -s -k test_get_facts_ok_and_schema --ini-config "$INI_CONFIG_FILE" --html="$HOST_ARTIFACTS/test_report_$(date +%Y-%m-%d_%H-%M-%S).html"
 # Now, let's deactivate venv
 deactivate
 echo "Returning to the original project path to be able to run the test again with new changes, if there are any"

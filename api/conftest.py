@@ -80,5 +80,5 @@ def setup_api_testing(request):
     Setting API instance for testing
     """
     _app_config = request.getfixturevalue("app_config")
-    protocol, host, port = get_http_prot_url_port_separately(_app_config.base_url)
+    protocol, host, port = get_http_prot_url_port_separately(_app_config.base_url)[0:3]
     request.cls.public_api = PublicApi(protocol, host, port)
