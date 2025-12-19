@@ -53,6 +53,13 @@ def app_config(pytestconfig) -> AppConfig:
     return AppConfig(**result_dict)
 
 
+def pytest_addoption(parser):
+    """
+    Supported options
+    """
+    parser.addoption("--ini-config", action="store", default="pytest.ini", help="The path to the *.ini config file")
+
+
 def timestamped_path(file_name: str, file_ext: str, path_to_file: str = os.getenv("HOST_ARTIFACTS")) -> str:
     """
     Args:
