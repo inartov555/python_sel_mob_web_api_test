@@ -93,7 +93,7 @@ def timestamped_path(file_name: str, file_ext: str, path_to_file: str = os.geten
     return os.path.join(path_to_file, f"{file_name}-{ts}.{file_ext}")
 
 
-def get_driver(browser: str) -> WebDriver:
+def get_driver(browser: str, pytestconfig, request) -> WebDriver:
     """
     Get a driver for passed browser settings
     """
@@ -120,12 +120,12 @@ def get_driver(browser: str) -> WebDriver:
 
 
 @pytest.fixture(scope="session")
-def driver(pytestconfig):
+def driver(pytestconfig, request):
     """
     Browser driver
     """
     _app_config = request.getfixturevalue("app_config")
-    _driver = get_driver(_app_config.browser)
+    _driver = get_driver(_app_config.browser, pytestconfig, request)
     yield _driver
     _driver.quit()
 
@@ -145,14 +145,6 @@ def setup_for_testing(request, driver):
     request.cls.home_page.open("https://m.twitch.tv")
     # Getting rid off the cookies overlay
     request.cls.home_page.confirm_cookies_overlay_if_shown()
-
-
-@pytest.fixture(scope="session")
-def base_url(pytestconfig) -> str:
-    """
-    Get base URL from the fixture
-    """
-    return pytestconfig.getoption("--base-url").rstrip("/")
 
 
 def get_mobile_emulation(version):
