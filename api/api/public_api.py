@@ -9,7 +9,7 @@ from pprint import pformat
 import requests
 from requests import Response
 
-from tools.logger.logger import Logger
+from shared_tools.logger.logger import Logger
 
 
 log = Logger(__name__)

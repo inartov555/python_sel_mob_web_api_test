@@ -4,8 +4,8 @@ Twitch mobile tests
 
 import pytest
 
-from tools.logger.logger import Logger
-from web.conftest import timestamped_path
+from shared_tools.logger.logger import Logger
+from web.src.utils.utils import ArtifactsUtils
 
 
 log = Logger(__name__)
@@ -17,7 +17,7 @@ class TestTwitchMobile:
     Twitch mobile tests
     """
 
-    def test_search_and_open_streamer(self, base_url):
+    def test_search_and_open_streamer(self, base_url) -> None:
         """
         Search and open streamer
         """
@@ -26,7 +26,7 @@ class TestTwitchMobile:
         # 2. Tap search icon
         self.home_page.open_search()
         # 3. Type query
-        self.search_page.search("StarCraft II")
+        self.search_page.type_text_and_press_enter("Anime")
         # 4. Scroll down twice (small delays to simulate user)
         self.search_page.scroll_by_xy_repeat(times=2)
         # 5. Open a streamer
@@ -34,6 +34,5 @@ class TestTwitchMobile:
         # 6. Wait for streamer page to load; take screenshot
         self.streamer_page.ensure_loaded()
         # 7. Taking a screenshot
-        screenshot_path = timestamped_path("test_search_and_open_streamer", "png")
-        self.driver.save_screenshot(screenshot_path)
+        screenshot_path = ArtifactsUtils.take_screenshot(self.driver, "test_search_and_open_streamer", "png")
         log.debug(f"Saved screenshot: {screenshot_path}")

@@ -2,153 +2,93 @@
 Base methods for derived pages
 """
 
-import time
-
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
 
-from tools.logger.logger import Logger
+from shared_tools.logger.logger import Logger
+from web.src.components.base_component import BaseComponent
+from web.src.components.overlay_cookie_consent import CookieConsentOverlay
+from web.src.components.overlay_transition_to_app import TransitionToAppOverlay
 
 
 log = Logger(__name__)
 
 
-class BasePage:
+class BasePage(BaseComponent):
     """
     Base methods for derived pages
     """
 
-    def __init__(self, driver):
+    def __init__(self, driver: WebDriver) -> None:
+        super().__init__(driver)
         self.driver = driver
+        self.cookie_consent_overlay_comp = CookieConsentOverlay(self.driver)
+        self.transition_to_app_overlay_comp = TransitionToAppOverlay(self.driver)
 
-    def pause(self, timeout: int = 3, reason: str = "Waiting a bit"):
+    def open(self, url: str = "") -> None:
         """
-        Args:
-            timeout (int/float): time in seconds to wait
+        Opening URL
         """
-        log.info(f"{reason}; timeout: {timeout}")
-        time.sleep(timeout)
-
-    def web_driver_wait(self, timeout: int = 5):
-        """
-        Setting WebDriverWait
-        """
-        return WebDriverWait(self.driver, timeout)
-
-    def action_chains(self):
-        """
-        Get ActionChains instance
-        """
-        return ActionChains(self.driver)
-
-    def click_and_drag(self, locator, move_by_x: int = 0, move_by_y: int = 300):
-        """
-        Clicking and dragging an element
-        """
-        web_element = self.driver.find_element(*locator)
-        self.action_chains().click_and_hold(web_element).move_by_offset(move_by_x, move_by_y).release().perform()
-
-    def blur_active_element(self):
-        """
-        Unfocusing the element being focused
-        """
-        self.driver.execute_script("document.activeElement && document.activeElement.blur();")
-
-    def is_displayed(self, locator):
-        """
-        Check if element is displayed
-        """
-        try:
-            result = self.driver.find_element(*locator).is_displayed()
-        except Exception:
-            result = False
-        return result
-
-    def wait_visible(self, locator, timeout: int = 5) -> bool:
-        """
-        Wait visible
-        """
-        return self.web_driver_wait(timeout).until(EC.visibility_of_element_located(locator))
-
-    def wait_clickable(self, locator, timeout: int = 5) -> bool:
-        """
-        Wait clickable
-        """
-        return self.web_driver_wait(timeout).until(EC.element_to_be_clickable(locator))
-
-    def click(self, locator) -> None:
-        """
-        Regular click
-        """
-        self.wait_clickable(locator).click()
-
-    def js_click(self, locator) -> None:
-        """
-        JavaScript click
-        """
-        # JavaScript click
-        web_element = self.driver.find_element(*locator)
-        self.driver.execute_script("arguments[0].click();", web_element)
-
-    def type(self, locator, text: str) -> None:
-        """
-        Type text
-        """
-        el = self.wait_visible(locator)
-        el.clear()
-        el.send_keys(text)
+        log.info(f"Opening URL {url}")
+        self.driver.get(url)
 
     def scroll_by(self, x: int = 0, y: int = 700) -> None:
         """
         Scroll the page
         """
+        log.info(f"Scrolling by: x {x}, y {y}")
         self.driver.execute_script("window.scrollBy(arguments[0], arguments[1]);", x, y)
 
-    def scroll_by_xy_repeat(self, x=0, y=700, times=1) -> None:
+    def scroll_by_xy_repeat(self,
+                            x: int = 0,
+                            y: int = 700,
+                            times: int = 1,
+                            timeout: int = 10,
+                           ) -> None:
         """
         When you need to scroll particular number of times
         """
+        log.info(f"Scrolling by repeat: x {x}, y {y}")
         for _ in range(times):
+            previous_y = self.driver.execute_script("return window.pageYOffset;")
             self.scroll_by(x, y)
-            self.pause(1)
+            try:
+                self.web_driver_wait(timeout).until(
+                    lambda d, prev=previous_y: d.execute_script(
+                        "return window.pageYOffset;"
+                    ) != prev
+                )
+            except TimeoutException:
+                pass
         self.blur_active_element()
 
     def scroll_into_center(self, locator) -> None:
         """
         Scroll into center
         """
+        log.info("Scroll into center")
         web_element = self.driver.find_element(*locator)
         self.driver.execute_script("arguments[0].scrollIntoView({block:'center', inline:'center'});", web_element)
-
-    def maybe_click(self, locator) -> None:
-        """
-        Tries to click, no effect if element is not clickable
-        """
-        try:
-            self.click(locator)
-            return True
-        except Exception:
-            return False
 
     def tap_empty_space(self) -> None:
         """
         Tapping empty space
         """
+        log.info("Tap empty space")
         try:
             self.action_chains().move_by_offset(1, 1).click().perform()
         except Exception:
             pass
 
-    def focus_first_visible(self, locator):
+    def focus_first_visible(self, locator) -> WebElement | None:
         """
-        Returns:
-            WebElement, focused element
+        Focus the 1st visible element
         """
+        log.info("Focus first visible element")
         try:
             web_element = self.find_first_visible_in_viewport(locator)
-            # set focus
             self.driver.execute_script("arguments[0].focus();", web_element)
             return web_element
         except Exception as ex:
@@ -159,15 +99,15 @@ class BasePage:
                                        locator,
                                        min_ratio: float = 0.5,
                                        top_margin: int = 90,
-                                       bottom_margin: int = 0):
+                                       bottom_margin: int = 0) -> WebElement:
         """
         Get the 1st visible element which is visible at list by min_ratio in view port and not covered by other elements.
 
         Returns:
             WebElement
         """
+        log.info("Find first visible in viewport")
         by, value = locator
-
         if by == By.CSS_SELECTOR:
             js = """
             const sel = arguments[0], ratio = arguments[1], topM = arguments[2], bottomM = arguments[3];
@@ -223,3 +163,15 @@ class BasePage:
             """
             return self.driver.execute_script(js, value, float(min_ratio), int(top_margin), int(bottom_margin))
         raise ValueError("Use CSS_SELECTOR or XPATH for this helper.")
+
+    def confirm_cookies_overlay_if_shown(self) -> None:
+        """
+        Clicking the Accept button on the "Cookies and Advertising Choices" overlay, if it's shown
+        """
+        self.cookie_consent_overlay_comp.handle_cookies_overlay(raise_error_if_not_visible=False)
+
+    def get_out_of_transition_to_app_overlay(self) -> None:
+        """
+        Clicking the Accept button on the "Cookies and Advertising Choices" overlay, if it's shown
+        """
+        self.transition_to_app_overlay_comp.handle_transition_to_app_overlay(raise_error_if_not_visible=False)
