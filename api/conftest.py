@@ -3,7 +3,6 @@ conftest.py file
 """
 
 import os
-from datetime import datetime
 from configparser import ConfigParser, ExtendedInterpolation
 
 import pytest
@@ -19,7 +18,7 @@ log = Logger(__name__)
 
 
 @pytest.fixture(autouse=True, scope="session")
-def add_api_loggers() -> None:
+def add_loggers() -> None:
     """
     The fixture to configure loggers
     It uses built-in pytest arguments to configure loggigng level and files
@@ -29,13 +28,14 @@ def add_api_loggers() -> None:
         log_file_level or --log-file-level  level of log to be stored to a file. Usually lower than general log
         log_file or --log-file  path where logs will be saved
     """
-    artifacts_folder_default = os.getenv("HOST_ARTIFACTS")
-    log_level = "DEBUG"
-    log_file_level = "DEBUG"
-    log_file = os.path.join(SharedArtifactsUtils.timestamped_path("pytest", "log", artifacts_folder_default))
-    log.setup_cli_handler(level=log_level)
-    log.setup_filehandler(level=log_file_level, file_name=log_file)
-    log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
+    log = SharedArtifactsUtils.get_configured_logger(
+        logger=log,
+        host_artifacts=os.getenv("HOST_ARTIFACTS"),
+        log_file_name="pytest",
+        log_file_ext="log",
+        log_level="DEBUG",
+        log_file_level="DEBUG"
+    )
 
 
 @pytest.fixture(scope="session")

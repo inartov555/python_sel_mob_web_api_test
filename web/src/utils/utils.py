@@ -29,9 +29,9 @@ class ArtifactsUtils(SharedArtifactsUtils):
 
     @classmethod
     def take_screenshot(cls,
+                        driver: WebDriver,
                         screenshot_name: str = "screenshot",
                         extension: str = "png",
-                        driver: WebDriver,
                        ) -> None:
         """
         Take a screenshot

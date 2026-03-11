@@ -3,7 +3,6 @@ conftest.py file
 """
 
 import os
-from datetime import datetime
 from collections.abc import Generator
 from typing import Any
 from configparser import ConfigParser, ExtendedInterpolation
@@ -15,6 +14,7 @@ from selenium.webdriver.chrome.options import Options
 
 from shared_tools.logger.logger import Logger
 from shared_tools.shared_artifacts_utils import SharedArtifactsUtils
+from web.src.utils import ArtifactsUtils
 from web.src.pages.home_page import HomePage
 from web.src.pages.search_page import SearchPage
 from web.src.pages.streamer_page import StreamerPage
@@ -25,7 +25,7 @@ log = Logger(__name__)
 
 
 @pytest.fixture(autouse=True, scope="session")
-def add_web_loggers() -> None:
+def add_loggers() -> None:
     """
     The fixture to configure loggers
     It uses built-in pytest arguments to configure loggigng level and files
@@ -35,13 +35,14 @@ def add_web_loggers() -> None:
         log_file_level or --log-file-level  level of log to be stored to a file. Usually lower than general log
         log_file or --log-file  path where logs will be saved
     """
-    artifacts_folder_default = os.getenv("HOST_ARTIFACTS")
-    log_level = "DEBUG"
-    log_file_level = "DEBUG"
-    log_file = os.path.join(SharedArtifactsUtils.timestamped_path("pytest", "log", artifacts_folder_default))
-    log.setup_cli_handler(level=log_level)
-    log.setup_filehandler(level=log_file_level, file_name=log_file)
-    log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
+    log = SharedArtifactsUtils.get_configured_logger(
+        logger=log,
+        host_artifacts=os.getenv("HOST_ARTIFACTS"),
+        log_file_name="pytest",
+        log_file_ext="log",
+        log_level="DEBUG",
+        log_file_level="DEBUG"
+    )
 
 
 @pytest.fixture(scope="session")
@@ -75,8 +76,7 @@ def screenshot_dir() -> str:
     """
     Getting screenshot directory
     """
-    artifacts_folder_default = os.getenv("HOST_ARTIFACTS")
-    return ArtifactsUtils.screenshot_dir(artifacts_folder_default)
+    return ArtifactsUtils.screenshot_dir(os.getenv("HOST_ARTIFACTS"))
 
 
 def get_driver(browser: str, pytestconfig, request) -> WebDriver:
@@ -104,10 +104,10 @@ def get_driver(browser: str, pytestconfig, request) -> WebDriver:
     raise ValueError(f"'{browser}' value is not currently supported")
 
 
-@pytest.fixture(scope="session")
-def driver(pytestconfig: pytest.Config,
-           request: pytest.FixtureRequest
-          ) -> Generator[WebDriver, None, None]:
+@pytest.fixture(name="driver", scope="session")
+def driver_fixture(pytestconfig: pytest.Config,
+                   request: pytest.FixtureRequest
+                  ) -> Generator[WebDriver, None, None]:
     """
     Browser driver
     """

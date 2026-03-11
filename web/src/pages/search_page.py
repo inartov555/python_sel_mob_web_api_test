@@ -29,7 +29,7 @@ class SearchPage(BasePage):
         """
         Typing search text, starting search and the unfocusing active element
         """
-        self.type(self.search_input, input_text + Keys.ENTER)
+        self.type_text(self.search_input, input_text + Keys.ENTER)
         self.blur_active_element()
 
     def open_first_streamer(self) -> None:
