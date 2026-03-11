@@ -42,6 +42,13 @@ def add_loggers() -> None:
     log.setup_cli_handler(level=log_level)
     log.setup_filehandler(level=log_file_level, file_name=log_file)
     log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
+
+
+def pytest_addoption(parser) -> None:
+    """
+    Supported options
+    """
+    parser.addoption("--ini-config", action="store", default="pytest.ini", help="The path to the *.ini config file")
 # pylint: enable=duplicate-code
 
 
@@ -62,13 +69,6 @@ def app_config(pytestconfig) -> AppConfig:
     result_dict["width"] = cfg.getint("pytest", "width", fallback=400)
     result_dict["height"] = cfg.getint("pytest", "height", fallback=1000)
     return AppConfig(**result_dict)
-
-
-def pytest_addoption(parser) -> None:
-    """
-    Supported options
-    """
-    parser.addoption("--ini-config", action="store", default="pytest.ini", help="The path to the *.ini config file")
 
 
 @pytest.fixture(scope="session")
