@@ -1,7 +1,6 @@
 """
 conftest.py file
 """
-# pylint: disable=duplicate-code
 
 import os
 from datetime import datetime
@@ -9,8 +8,9 @@ from configparser import ConfigParser, ExtendedInterpolation
 
 import pytest
 
-from tools.logger.logger import Logger
-from tools.url_utils import get_http_prot_url_port_separately
+from shared_tools.logger.logger import Logger
+from shared_tools.url_utils import get_http_prot_url_port_separately
+from shared_tools.shared_artifacts_utils import SharedArtifactsUtils
 from api.api.public_api import PublicApi
 from api.core.app_config import AppConfig
 
@@ -19,7 +19,7 @@ log = Logger(__name__)
 
 
 @pytest.fixture(autouse=True, scope="session")
-def add_loggers() -> None:
+def add_api_loggers() -> None:
     """
     The fixture to configure loggers
     It uses built-in pytest arguments to configure loggigng level and files
@@ -32,7 +32,7 @@ def add_loggers() -> None:
     artifacts_folder_default = os.getenv("HOST_ARTIFACTS")
     log_level = "DEBUG"
     log_file_level = "DEBUG"
-    log_file = os.path.join(timestamped_path("pytest", "log", artifacts_folder_default))
+    log_file = os.path.join(SharedArtifactsUtils.timestamped_path("pytest", "log", artifacts_folder_default))
     log.setup_cli_handler(level=log_level)
     log.setup_filehandler(level=log_file_level, file_name=log_file)
     log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
@@ -52,29 +52,15 @@ def app_config(pytestconfig) -> AppConfig:
     return AppConfig(**result_dict)
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser) -> None:
     """
     Supported options
     """
     parser.addoption("--ini-config", action="store", default="pytest.ini", help="The path to the *.ini config file")
 
 
-def timestamped_path(file_name: str, file_ext: str, path_to_file: str = os.getenv("HOST_ARTIFACTS")) -> str:
-    """
-    Args:
-        file_name (str): e.g. screenshot
-        file_ext (str): file extention, e.g., png
-        path_to_file (str): e.g. /home/user/test_dir/artifacts/
-
-    Returns:
-        str, timestamped path
-    """
-    ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S.%f")
-    return os.path.join(path_to_file, f"{file_name}-{ts}.{file_ext}")
-
-
 @pytest.fixture(autouse=True, scope="class")
-def setup_api_testing(request):
+def setup_api_testing(request) -> None:
     """
     Setting API instance for testing
     """

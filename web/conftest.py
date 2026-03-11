@@ -1,7 +1,6 @@
 """
 conftest.py file
 """
-# pylint: disable=duplicate-code
 
 import os
 from datetime import datetime
@@ -15,6 +14,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.chrome.options import Options
 
 from shared_tools.logger.logger import Logger
+from shared_tools.shared_artifacts_utils import SharedArtifactsUtils
 from web.src.pages.home_page import HomePage
 from web.src.pages.search_page import SearchPage
 from web.src.pages.streamer_page import StreamerPage
@@ -25,7 +25,7 @@ log = Logger(__name__)
 
 
 @pytest.fixture(autouse=True, scope="session")
-def add_loggers() -> None:
+def add_web_loggers() -> None:
     """
     The fixture to configure loggers
     It uses built-in pytest arguments to configure loggigng level and files
@@ -38,7 +38,7 @@ def add_loggers() -> None:
     artifacts_folder_default = os.getenv("HOST_ARTIFACTS")
     log_level = "DEBUG"
     log_file_level = "DEBUG"
-    log_file = os.path.join(timestamped_path("pytest", "log", artifacts_folder_default))
+    log_file = os.path.join(SharedArtifactsUtils.timestamped_path("pytest", "log", artifacts_folder_default))
     log.setup_cli_handler(level=log_level)
     log.setup_filehandler(level=log_file_level, file_name=log_file)
     log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
@@ -75,24 +75,8 @@ def screenshot_dir() -> str:
     """
     Getting screenshot directory
     """
-    # path_from_input_params = pytestconfig.getoption("--screenshot-dir")
     artifacts_folder_default = os.getenv("HOST_ARTIFACTS")
-    os.makedirs(artifacts_folder_default, exist_ok=True)
-    return artifacts_folder_default
-
-
-def timestamped_path(file_name: str, file_ext: str, path_to_file: str = os.getenv("HOST_ARTIFACTS")) -> str:
-    """
-    Args:
-        file_name (str): e.g. screenshot
-        file_ext (str): file extention, e.g., png
-        path_to_file (str): e.g. /home/user/test_dir/artifacts/
-
-    Returns:
-        str, timestamped path
-    """
-    ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S.%f")
-    return os.path.join(path_to_file, f"{file_name}-{ts}.{file_ext}")
+    return ArtifactsUtils.screenshot_dir(artifacts_folder_default)
 
 
 def get_driver(browser: str, pytestconfig, request) -> WebDriver:
