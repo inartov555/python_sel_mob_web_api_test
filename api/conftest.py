@@ -17,6 +17,7 @@ from api.core.app_config import AppConfig
 log = Logger(__name__)
 
 
+# pylint: disable=duplicate-code
 @pytest.fixture(autouse=True, scope="session")
 def add_loggers() -> None:
     """
@@ -35,6 +36,7 @@ def add_loggers() -> None:
     log.setup_cli_handler(level=log_level)
     log.setup_filehandler(level=log_file_level, file_name=log_file)
     log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
+# pylint: enable=duplicate-code
 
 
 @pytest.fixture(scope="session")
