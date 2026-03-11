@@ -21,10 +21,10 @@ class Logger:
         """
         Wrapper over logging class that initializes a logger with the config in 'tools/logger/logging.json'
         To modify default log level edit in 'tools/logger/logging.json' the parameter json['handlers']['console']['info']
-        Logging path is LOG_PATH if defined else it's project root directory.
+        Logging path is LOG_PATH if defined, else it's the project root directory.
 
         Args:
-            logger_name (str): altough any name can be used, it's recommended to use __name__ python variable
+            logger_name (str): although any name can be used, it's recommended to use __name__ python variable
         """
         # creating logger
         if not logger_name.startswith("test"):
@@ -59,8 +59,8 @@ class Logger:
 
     def __update_handler(self, logr, handlr):
         """
-        Update loggers handler with new log level. The method will get all handlers of logger and change level
-        of existing logger if the handler already setup for logger
+        Update the logger's handler with a new log level. The method will get all handlers of the logger and change the level
+        of the existing logger if the handler is already set up for the logger
 
         Args:
             logr (logger): logger to be updated
@@ -75,7 +75,7 @@ class Logger:
 
     def __get_file_handler(self, level: str, file_name: str):
         """
-        Method to create file handler or get it from a cash
+        Method to create a file handler or get it from a cache
 
         Args:
             level (str): level name
@@ -95,7 +95,7 @@ class Logger:
 
     def __get_cli_handler(self, level: str):
         """
-        Method to create Stream handler or get it froma cash
+        Method to create a stream handler or get it from a cache
 
         Args:
             level (str): level name
@@ -114,8 +114,8 @@ class Logger:
 
     def setup_cli_handler(self, level: str):
         """
-        Method to set up CLI handler for particular logger or all available
-        If CLI handler was set up for all loggers then all new will be created with the same config
+        Method to set up a CLI handler for a particular logger or all available loggers
+        If the CLI handler was set up for all loggers, then all new ones will be created with the same config
 
         Args:
             level (str/int): level for the file handler
@@ -127,8 +127,8 @@ class Logger:
 
     def setup_filehandler(self, file_name: str, level: str = "DEBUG"):
         """
-        Method to setup file handler for particular logger or all available
-        If file handler was setup for all loggers then all new will be created with the same config
+        Method to setup file handler for a particular logger or all available
+        If the file handler was set up for all loggers, then all new loggers will be created with the same config
 
         Args:
             file_name (str): path where logs should be stored
