@@ -14,10 +14,10 @@ from api.api.public_api import PublicApi
 from api.core.app_config import AppConfig
 
 
+# pylint: disable=duplicate-code
 log = Logger(__name__)
 
 
-# pylint: disable=duplicate-code
 @pytest.fixture(autouse=True, scope="session")
 def add_loggers() -> None:
     """
