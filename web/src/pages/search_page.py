@@ -29,6 +29,7 @@ class SearchPage(BasePage):
         """
         Typing search text, starting search and the unfocusing active element
         """
+        log.info("Type text and press enter")
         self.type_text(self.search_input, input_text + Keys.ENTER)
         self.blur_active_element()
 
@@ -36,6 +37,7 @@ class SearchPage(BasePage):
         """
         Heuristic: click the first visible result anchor
         """
+        log.info("Select the first video in the visible list")
         self.wait_visible(self.first_result)
         el = self.focus_first_visible(self.first_result)
         el.click()

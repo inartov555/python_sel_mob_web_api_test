@@ -31,12 +31,14 @@ class BasePage(BaseComponent):
         """
         Opening URL
         """
+        log.info(f"Opening URL {url}")
         self.driver.get(url)
 
     def scroll_by(self, x: int = 0, y: int = 700) -> None:
         """
         Scroll the page
         """
+        log.info(f"Scrolling by: x {x}, y {y}")
         self.driver.execute_script("window.scrollBy(arguments[0], arguments[1]);", x, y)
 
     def scroll_by_xy_repeat(self,
@@ -48,6 +50,7 @@ class BasePage(BaseComponent):
         """
         When you need to scroll particular number of times
         """
+        log.info(f"Scrolling by repeat: x {x}, y {y}")
         for _ in range(times):
             previous_y = self.driver.execute_script("return window.pageYOffset;")
             self.scroll_by(x, y)
@@ -65,6 +68,7 @@ class BasePage(BaseComponent):
         """
         Scroll into center
         """
+        log.info("Scroll into center")
         web_element = self.driver.find_element(*locator)
         self.driver.execute_script("arguments[0].scrollIntoView({block:'center', inline:'center'});", web_element)
 
@@ -72,6 +76,7 @@ class BasePage(BaseComponent):
         """
         Tapping empty space
         """
+        log.info("Tap empty space")
         try:
             self.action_chains().move_by_offset(1, 1).click().perform()
         except Exception:
@@ -81,6 +86,7 @@ class BasePage(BaseComponent):
         """
         Focus the 1st visible element
         """
+        log.info("Focus first visible element")
         try:
             web_element = self.find_first_visible_in_viewport(locator)
             self.driver.execute_script("arguments[0].focus();", web_element)
@@ -100,8 +106,8 @@ class BasePage(BaseComponent):
         Returns:
             WebElement
         """
+        log.info("Find first visible in viewport")
         by, value = locator
-
         if by == By.CSS_SELECTOR:
             js = """
             const sel = arguments[0], ratio = arguments[1], topM = arguments[2], bottomM = arguments[3];

@@ -32,7 +32,7 @@ class StreamerPage(BasePage):
         """
         Make sure the video/player is visible
         """
-        # Try to close any modal/popups if they appear
+        log.info("Ensure that page with video player opened")
         for loc in self.dismiss_selectors:
             self.maybe_click(loc)
         try:

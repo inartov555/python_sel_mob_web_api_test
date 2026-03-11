@@ -24,5 +24,6 @@ class HomePage(BasePage):
         """
         Open search page
         """
+        log.info("Open the Search page")
         self.click(self.search_icon)
         self.get_out_of_transition_to_app_overlay()  # sometimes, app transition overlay is shown at this point

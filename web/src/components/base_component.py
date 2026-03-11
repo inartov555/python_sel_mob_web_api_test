@@ -21,12 +21,6 @@ class BaseComponent:
     def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
 
-    def open(self, url: str = "") -> None:
-        """
-        Opening URL
-        """
-        self.driver.get(url)
-
     def action_chains(self) -> ActionChains:
         """
         Get ActionChains instance

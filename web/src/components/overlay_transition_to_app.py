@@ -6,7 +6,11 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
+from shared_tools.logger.logger import Logger
 from web.src.components.base_component import BaseComponent
+
+
+log = Logger(__name__)
 
 
 class TransitionToAppOverlay(BaseComponent):
@@ -28,6 +32,7 @@ class TransitionToAppOverlay(BaseComponent):
         """
         Clicking the Accept button on the "Cookies and Advertising Choices" overlay
         """
+        log.info("Handling the transition to app overlay")
         try:
             if self.wait_visible(self.transition_to_app_overlay, 2):
                 self.js_click(self.close_overlay)
