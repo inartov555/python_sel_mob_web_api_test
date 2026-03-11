@@ -34,5 +34,5 @@ class TestTwitchMobile:
         # 6. Wait for streamer page to load; take screenshot
         self.streamer_page.ensure_loaded()
         # 7. Taking a screenshot
-        ArtifactsUtils.take_screenshot(self.driver, "test_search_and_open_streamer", "png")
+        screenshot_path = ArtifactsUtils.take_screenshot(self.driver, "test_search_and_open_streamer", "png")
         log.debug(f"Saved screenshot: {screenshot_path}")

@@ -131,7 +131,7 @@ def setup_for_testing(request: pytest.FixtureRequest,
     request.cls.streamer_page = StreamerPage(driver)
     # 1. Open home
     request.cls.home_page.open(_app_config.base_url)
-    # Getting rid off the cookies overlay
+    request.cls.home_page.get_out_of_transition_to_app_overlay()
     request.cls.home_page.confirm_cookies_overlay_if_shown()
 
 

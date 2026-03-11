@@ -23,7 +23,7 @@ class StreamerPage(BasePage):
             (By.CSS_SELECTOR, "button[aria-label='Close'], button[aria-label='Dismiss']"),
             (By.CSS_SELECTOR, "button:has(svg[aria-label='Close'])"),
             (By.CSS_SELECTOR, "button[data-a-target='consent-banner-accept'], button[aria-label*='Accept']"),
-            (By.CSS_SELECTOR, "button:contains('Continue'), a:contains('Continue')")
+            (By.XPATH, "//button[contains(normalize-space(.), 'Continue')] | //a[contains(normalize-space(.), 'Continue')]")
         ]
         self.video_player = (By.CSS_SELECTOR, "video, div[data-a-target='video-player'], div[class*='player']")
         self.channel_header = (By.CSS_SELECTOR, "header, h1, h2")

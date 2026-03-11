@@ -32,9 +32,10 @@ class ArtifactsUtils(SharedArtifactsUtils):
                         driver: WebDriver,
                         screenshot_name: str = "screenshot",
                         extension: str = "png",
-                       ) -> None:
+                       ) -> str:
         """
         Take a screenshot
         """
         screenshot_path = cls.timestamped_path(screenshot_name, extension)
         driver.save_screenshot(screenshot_path)
+        return screenshot_path

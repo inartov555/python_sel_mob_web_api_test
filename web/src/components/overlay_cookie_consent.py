@@ -23,7 +23,7 @@ class CookieConsentOverlay(BaseComponent):
         """
         try:
             self.wait_visible(self.accept_button)
-            self.click(self.accept_button)
+            self.js_click(self.accept_button)
         except TimeoutException:
             if raise_error_if_not_visible:
                 raise
