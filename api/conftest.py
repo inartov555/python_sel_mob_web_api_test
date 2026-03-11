@@ -43,7 +43,6 @@ def pytest_addoption(parser) -> None:
     Supported options
     """
     parser.addoption("--ini-config", action="store", default="pytest.ini", help="The path to the *.ini config file")
-# pylint: enable=duplicate-code
 
 
 @pytest.fixture(scope="session")
@@ -58,6 +57,7 @@ def app_config(pytestconfig) -> AppConfig:
     cfg.read(ini_config_file)
     result_dict["base_url"] = cfg.get("pytest", "base_url", fallback="https://catfact.ninja")
     return AppConfig(**result_dict)
+# pylint: enable=duplicate-code
 
 
 @pytest.fixture(autouse=True, scope="class")

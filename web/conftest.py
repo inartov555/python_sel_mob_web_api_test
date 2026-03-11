@@ -49,7 +49,6 @@ def pytest_addoption(parser) -> None:
     Supported options
     """
     parser.addoption("--ini-config", action="store", default="pytest.ini", help="The path to the *.ini config file")
-# pylint: enable=duplicate-code
 
 
 @pytest.fixture(scope="session")
@@ -69,6 +68,7 @@ def app_config(pytestconfig) -> AppConfig:
     result_dict["width"] = cfg.getint("pytest", "width", fallback=400)
     result_dict["height"] = cfg.getint("pytest", "height", fallback=1000)
     return AppConfig(**result_dict)
+# pylint: enable=duplicate-code
 
 
 @pytest.fixture(scope="session")
