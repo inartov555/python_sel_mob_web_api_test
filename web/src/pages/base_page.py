@@ -2,14 +2,9 @@
 Base methods for derived pages
 """
 
-import time
-
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 from shared_tools.logger.logger import Logger
 from web.src.components.base_component import BaseComponent
@@ -26,9 +21,10 @@ class BasePage(BaseComponent):
     """
 
     def __init__(self, driver: WebDriver) -> None:
+        super().__init__(driver)
         self.driver = driver
-        self.cookie_consent_overlay_comp = CookieConsentOverlay()
-        self.transition_to_app_overlay_comp = TransitionToAppOverlay()
+        self.cookie_consent_overlay_comp = CookieConsentOverlay(self.driver)
+        self.transition_to_app_overlay_comp = TransitionToAppOverlay(self.driver)
 
     def open(self, url: str = "") -> None:
         """
@@ -47,8 +43,11 @@ class BasePage(BaseComponent):
         When you need to scroll particular number of times
         """
         for _ in range(times):
+            prev_y = self.driver.execute_script("return window.pageYOffset;")
             self.scroll_by(x, y)
-            self.pause(1)
+            self.web_driver_wait(timeout).until(
+                lambda d: d.execute_script("return window.pageYOffset;") != prev_y
+            )
         self.blur_active_element()
 
     def scroll_into_center(self, locator) -> None:
