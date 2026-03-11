@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 
 
-class SharedArtifactsUtils:
+class SharedArtifactsUtils:  # pylint: disable=too-few-public-methods
     """
     Utils related to artifacts
     """
