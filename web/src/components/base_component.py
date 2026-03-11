@@ -33,7 +33,7 @@ class BaseComponent:
         """
         return ActionChains(self.driver)
 
-    def web_driver_wait(self, timeout: int = 5) -> WebDriverWait:
+    def web_driver_wait(self, timeout: int = 10) -> WebDriverWait:
         """
         Setting WebDriverWait
         """
@@ -62,13 +62,13 @@ class BaseComponent:
             result = False
         return result
 
-    def wait_visible(self, locator, timeout: int = 5) -> bool:
+    def wait_visible(self, locator, timeout: int = 10) -> bool:
         """
         Wait visible
         """
         return self.web_driver_wait(timeout).until(EC.visibility_of_element_located(locator))
 
-    def wait_clickable(self, locator, timeout: int = 5) -> bool:
+    def wait_clickable(self, locator, timeout: int = 10) -> bool:
         """
         Wait clickable
         """

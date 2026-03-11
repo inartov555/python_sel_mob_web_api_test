@@ -24,7 +24,7 @@ class TransitionToAppOverlay(BaseComponent):
             "//button[@class='InjectLayout-sc-1i43xsx-0 ccdBQN']"
         )
 
-    def get_out_of_transition_to_app_overlay(self, raise_error_if_not_visible: bool = False) -> None:
+    def handle_transition_to_app_overlay(self, raise_error_if_not_visible: bool = False) -> None:
         """
         Clicking the Accept button on the "Cookies and Advertising Choices" overlay
         """

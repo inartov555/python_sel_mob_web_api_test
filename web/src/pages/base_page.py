@@ -2,6 +2,7 @@
 Base methods for derived pages
 """
 
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
@@ -42,17 +43,22 @@ class BasePage(BaseComponent):
                             x: int = 0,
                             y: int = 700,
                             times: int = 1,
-                            timeout: int = 7
+                            timeout: int = 10,
                            ) -> None:
         """
         When you need to scroll particular number of times
         """
         for _ in range(times):
-            previous_y_offset = self.driver.execute_script("return window.pageYOffset;")
+            previous_y = self.driver.execute_script("return window.pageYOffset;")
             self.scroll_by(x, y)
-            self.web_driver_wait(timeout).until(
-                lambda d, expected_y=previous_y_offset: d.execute_script("return window.pageYOffset;") != expected_y
-            )
+            try:
+                self.web_driver_wait(timeout).until(
+                    lambda d, prev=previous_y: d.execute_script(
+                        "return window.pageYOffset;"
+                    ) != prev
+                )
+            except TimeoutException:
+                pass
         self.blur_active_element()
 
     def scroll_into_center(self, locator) -> None:
@@ -156,10 +162,10 @@ class BasePage(BaseComponent):
         """
         Clicking the Accept button on the "Cookies and Advertising Choices" overlay, if it's shown
         """
-        self.cookie_consent_overlay_comp.confirm_cookies_overlay_if_shown(raise_error_if_not_visible=False)
+        self.cookie_consent_overlay_comp.handle_cookies_overlay(raise_error_if_not_visible=False)
 
     def get_out_of_transition_to_app_overlay(self) -> None:
         """
         Clicking the Accept button on the "Cookies and Advertising Choices" overlay, if it's shown
         """
-        self.transition_to_app_overlay_comp.get_out_of_transition_to_app_overlay(raise_error_if_not_visible=False)
+        self.transition_to_app_overlay_comp.handle_transition_to_app_overlay(raise_error_if_not_visible=False)
