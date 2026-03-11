@@ -2,9 +2,16 @@
 Base class for components
 """
 
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.by import By
+from selenium.common.exceptions import (
+    TimeoutException,
+    NoSuchElementException,
+    StaleElementReferenceException,
+    ElementClickInterceptedException
+)
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class BaseComponent:
@@ -19,6 +26,12 @@ class BaseComponent:
         Opening URL
         """
         self.driver.get(url)
+
+    def action_chains(self) -> ActionChains:
+        """
+        Get ActionChains instance
+        """
+        return ActionChains(self.driver)
 
     def web_driver_wait(self, timeout: int = 5) -> WebDriverWait:
         """
@@ -45,7 +58,7 @@ class BaseComponent:
         """
         try:
             result = self.driver.find_element(*locator).is_displayed()
-        except Exception:
+        except (NoSuchElementException, StaleElementReferenceException):
             result = False
         return result
 
@@ -82,12 +95,16 @@ class BaseComponent:
         el.clear()
         el.send_keys(text)
 
-    def maybe_click(self, locator) -> None:
+    def maybe_click(self, locator) -> bool:
         """
         Tries to click, no effect if element is not clickable
         """
         try:
             self.click(locator)
             return True
-        except Exception:
+        except (
+            TimeoutException,
+            ElementClickInterceptedException,
+            StaleElementReferenceException,
+        ):
             return False

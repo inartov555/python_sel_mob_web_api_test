@@ -36,12 +36,6 @@ class BasePage(BaseComponent):
         """
         self.driver.get(url)
 
-    def action_chains(self) -> ActionChains:
-        """
-        Get ActionChains instance
-        """
-        return ActionChains(self.driver)
-
     def scroll_by(self, x: int = 0, y: int = 700) -> None:
         """
         Scroll the page

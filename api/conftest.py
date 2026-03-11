@@ -28,14 +28,13 @@ def add_loggers() -> None:
         log_file_level or --log-file-level  level of log to be stored to a file. Usually lower than general log
         log_file or --log-file  path where logs will be saved
     """
-    log = SharedArtifactsUtils.get_configured_logger(
-        logger=log,
-        host_artifacts=os.getenv("HOST_ARTIFACTS"),
-        log_file_name="pytest",
-        log_file_ext="log",
-        log_level="DEBUG",
-        log_file_level="DEBUG"
-    )
+    artifacts_folder_default = os.getenv("HOST_ARTIFACTS")
+    log_level = "DEBUG"
+    log_file_level = "DEBUG"
+    log_file = os.path.join(SharedArtifactsUtils.timestamped_path("pytest", "log", artifacts_folder_default))
+    log.setup_cli_handler(level=log_level)
+    log.setup_filehandler(level=log_file_level, file_name=log_file)
+    log.info(f"General loglevel: '{log_level}', File: '{log_file_level}'")
 
 
 @pytest.fixture(scope="session")
