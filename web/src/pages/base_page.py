@@ -38,15 +38,20 @@ class BasePage(BaseComponent):
         """
         self.driver.execute_script("window.scrollBy(arguments[0], arguments[1]);", x, y)
 
-    def scroll_by_xy_repeat(self, x=0, y=700, times=1) -> None:
+    def scroll_by_xy_repeat(self,
+                            x: int = 0,
+                            y: int = 700,
+                            times: int = 1,
+                            timeout: int = 7
+                           ) -> None:
         """
         When you need to scroll particular number of times
         """
         for _ in range(times):
-            prev_y = self.driver.execute_script("return window.pageYOffset;")
+            previous_y_offset = self.driver.execute_script("return window.pageYOffset;")
             self.scroll_by(x, y)
             self.web_driver_wait(timeout).until(
-                lambda d: d.execute_script("return window.pageYOffset;") != prev_y
+                lambda d, expected_y=previous_y_offset: d.execute_script("return window.pageYOffset;") != expected_y
             )
         self.blur_active_element()
 
@@ -66,10 +71,9 @@ class BasePage(BaseComponent):
         except Exception:
             pass
 
-    def focus_first_visible(self, locator) -> None:
+    def focus_first_visible(self, locator) -> WebElement | None:
         """
-        Returns:
-            WebElement, focused element
+        Focus the 1st visible element
         """
         try:
             web_element = self.find_first_visible_in_viewport(locator)
