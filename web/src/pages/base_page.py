@@ -4,12 +4,16 @@ Base methods for derived pages
 
 import time
 
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-from tools.logger.logger import Logger
+from shared_tools.logger.logger import Logger
+from web.components.overlay_cookie_consent import CookieConsentOverlay
+from web.components.overlay_transition_to_app import TransitionToAppOverlay
 
 
 log = Logger(__name__)
@@ -20,43 +24,43 @@ class BasePage:
     Base methods for derived pages
     """
 
-    def __init__(self, driver):
+    def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
+        self.cookie_consent_overlay_comp = CookieConsentOverlay()
+        self.transition_to_app_overlay_comp = TransitionToAppOverlay()
 
-    def pause(self, timeout: int = 3, reason: str = "Waiting a bit"):
+    def open(self, url: str = "") -> None:
         """
-        Args:
-            timeout (int/float): time in seconds to wait
+        Opening URL
         """
-        log.info(f"{reason}; timeout: {timeout}")
-        time.sleep(timeout)
+        self.driver.get(url)
 
-    def web_driver_wait(self, timeout: int = 5):
+    def web_driver_wait(self, timeout: int = 5) -> WebDriverWait:
         """
         Setting WebDriverWait
         """
         return WebDriverWait(self.driver, timeout)
 
-    def action_chains(self):
+    def action_chains(self) -> ActionChains:
         """
         Get ActionChains instance
         """
         return ActionChains(self.driver)
 
-    def click_and_drag(self, locator, move_by_x: int = 0, move_by_y: int = 300):
+    def click_and_drag(self, locator, move_by_x: int = 0, move_by_y: int = 300) -> None:
         """
         Clicking and dragging an element
         """
         web_element = self.driver.find_element(*locator)
         self.action_chains().click_and_hold(web_element).move_by_offset(move_by_x, move_by_y).release().perform()
 
-    def blur_active_element(self):
+    def blur_active_element(self) -> None:
         """
         Unfocusing the element being focused
         """
         self.driver.execute_script("document.activeElement && document.activeElement.blur();")
 
-    def is_displayed(self, locator):
+    def is_displayed(self, locator) -> bool:
         """
         Check if element is displayed
         """
@@ -88,7 +92,6 @@ class BasePage:
         """
         JavaScript click
         """
-        # JavaScript click
         web_element = self.driver.find_element(*locator)
         self.driver.execute_script("arguments[0].click();", web_element)
 
@@ -141,14 +144,13 @@ class BasePage:
         except Exception:
             pass
 
-    def focus_first_visible(self, locator):
+    def focus_first_visible(self, locator) -> None:
         """
         Returns:
             WebElement, focused element
         """
         try:
             web_element = self.find_first_visible_in_viewport(locator)
-            # set focus
             self.driver.execute_script("arguments[0].focus();", web_element)
             return web_element
         except Exception as ex:
@@ -159,7 +161,7 @@ class BasePage:
                                        locator,
                                        min_ratio: float = 0.5,
                                        top_margin: int = 90,
-                                       bottom_margin: int = 0):
+                                       bottom_margin: int = 0) -> WebElement:
         """
         Get the 1st visible element which is visible at list by min_ratio in view port and not covered by other elements.
 
@@ -223,3 +225,15 @@ class BasePage:
             """
             return self.driver.execute_script(js, value, float(min_ratio), int(top_margin), int(bottom_margin))
         raise ValueError("Use CSS_SELECTOR or XPATH for this helper.")
+
+    def confirm_cookies_overlay_if_shown(self) -> None:
+        """
+        Clicking the Accept button on the "Cookies and Advertising Choices" overlay, if it's shown
+        """
+        self.cookie_consent_overlay_comp.confirm_cookies_overlay_if_shown(raise_error_if_not_visible=False)
+
+    def get_out_of_transition_to_app_overlay(self) -> None:
+        """
+        Clicking the Accept button on the "Cookies and Advertising Choices" overlay, if it's shown
+        """
+        self.transition_to_app_overlay_comp.get_out_of_transition_to_app_overlay(raise_error_if_not_visible=False)

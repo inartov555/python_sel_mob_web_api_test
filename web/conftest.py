@@ -5,6 +5,8 @@ conftest.py file
 
 import os
 from datetime import datetime
+from collections.abc import Generator
+from typing import Any
 from configparser import ConfigParser, ExtendedInterpolation
 
 import pytest
@@ -12,7 +14,7 @@ from selenium import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.chrome.options import Options
 
-from tools.logger.logger import Logger
+from shared_tools.logger.logger import Logger
 from web.src.pages.home_page import HomePage
 from web.src.pages.search_page import SearchPage
 from web.src.pages.streamer_page import StreamerPage
@@ -61,7 +63,7 @@ def app_config(pytestconfig) -> AppConfig:
     return AppConfig(**result_dict)
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser) -> None:
     """
     Supported options
     """
@@ -119,7 +121,9 @@ def get_driver(browser: str, pytestconfig, request) -> WebDriver:
 
 
 @pytest.fixture(scope="session")
-def driver(pytestconfig, request):
+def driver(pytestconfig: pytest.Config,
+           request: pytest.FixtureRequest
+          ) -> Generator[WebDriver, None, None]:
     """
     Browser driver
     """
@@ -129,9 +133,10 @@ def driver(pytestconfig, request):
     _driver.quit()
 
 
-# pylint: disable=redefined-outer-name
 @pytest.fixture(autouse=True, scope="function")
-def setup_for_testing(request, driver):
+def setup_for_testing(request: pytest.FixtureRequest,
+                      driver: WebDriver
+                     ) -> None:
     """
     Setting up pages for testing
     """
@@ -140,7 +145,6 @@ def setup_for_testing(request, driver):
     request.cls.home_page = HomePage(driver)
     request.cls.search_page = SearchPage(driver)
     request.cls.streamer_page = StreamerPage(driver)
-
     # 1. Open home
     request.cls.home_page.open(_app_config.base_url)
     # Getting rid off the cookies overlay
@@ -156,7 +160,7 @@ def base_url(request) -> str:
     return _app_config.base_url
 
 
-def get_mobile_emulation(version):
+def get_mobile_emulation(version) -> dict[str, Any]:
     """
     If you get "selenium.common.exceptions.InvalidArgumentException: Message:
     invalid argument: cannot parse capability: goog:chromeOptions" error,

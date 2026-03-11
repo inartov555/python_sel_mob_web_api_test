@@ -4,7 +4,7 @@ Twitch mobile tests
 
 import pytest
 
-from tools.logger.logger import Logger
+from shared_tools.logger.logger import Logger
 from web.conftest import timestamped_path
 
 
@@ -17,7 +17,7 @@ class TestTwitchMobile:
     Twitch mobile tests
     """
 
-    def test_search_and_open_streamer(self, base_url):
+    def test_search_and_open_streamer(self, base_url) -> None:
         """
         Search and open streamer
         """
@@ -26,7 +26,7 @@ class TestTwitchMobile:
         # 2. Tap search icon
         self.home_page.open_search()
         # 3. Type query
-        self.search_page.search("StarCraft II")
+        self.search_page.type_text_and_press_enter("StarCraft II")
         # 4. Scroll down twice (small delays to simulate user)
         self.search_page.scroll_by_xy_repeat(times=2)
         # 5. Open a streamer
